@@ -1,0 +1,43 @@
+services:
+  mongodb:
+    ports:
+      - "27018:27017"
+
+  backend:
+    build:
+      context: ./backend
+      target: development
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/todo
+      - JWT_SECRET=${JWT_SECRET:-BI_MAT}
+      - PORT=8000
+      - GMAIL_USERNAME=${GMAIL_USERNAME:-}
+      - GMAIL_PASSWORD=${GMAIL_PASSWORD:-}
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    stdin_open: true
+    tty: true
