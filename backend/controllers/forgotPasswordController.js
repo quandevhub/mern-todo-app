@@ -21,8 +21,8 @@ const forgotPassword = async (req, res) => {
     await user.save();
     
     //Send email with reset token
-    const resetUrl = `https://todo-app-b96a5.web.app/resetPassword?token=${resetToken}`;
-    var transporter = createTransport({
+    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/resetPassword?token=${resetToken}`;
+    const transporter = createTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
         port: 465,
@@ -33,21 +33,21 @@ const forgotPassword = async (req, res) => {
         }
     });
 
-    var mailOptions = {
-        from: 'alok.yadav6000@gmail.com',
+    const mailOptions = {
+        from: process.env.GMAIL_USERNAME,
         to: email,
         subject: "Reset Password",
         html:`<h1>Reset Password</h1><h2>Click on the link to reset your password</h2><h3>${resetUrl}</h3>`
     };
 
-    await transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
-    
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent: ' + info.response);
+    } catch (error) {
+        console.log('Email error:', error);
+        return res.status(500).json({ message: 'Failed to send email. Please try again.' });
+    }
+
     res.status(200).json({ message: 'A link to reset your password have been sent to your email.' });
   };
   

@@ -16,8 +16,6 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/todo
       - JWT_SECRET=${JWT_SECRET:-BI_MAT}
       - PORT=8000
-      - GMAIL_USERNAME=${GMAIL_USERNAME:-}
-      - GMAIL_PASSWORD=${GMAIL_PASSWORD:-}
     depends_on:
       - mongodb
     networks:
