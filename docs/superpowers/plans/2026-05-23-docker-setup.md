@@ -1,7 +1,5 @@
 # Docker Setup Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** Đóng gói toàn bộ MERN Todo App (MongoDB + Express backend + React frontend) bằng Docker với docker-compose override pattern hỗ trợ cả môi trường Dev và Prod.
 
 **Architecture:** Base `docker-compose.yml` định nghĩa MongoDB và shared network/volumes. `docker-compose.dev.yml` override thêm hot-reload và source mounts. `docker-compose.prod.yml` override build optimized images với Nginx serve frontend và proxy API.
@@ -184,12 +182,10 @@ networks:
 - [ ] **Step 1: Tạo docker-compose.dev.yml**
 
 ```yaml
-version: '3.8'
-
 services:
   mongodb:
     ports:
-      - "27017:27017"
+      - "27018:27017"
 
   backend:
     build:
@@ -200,12 +196,10 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+    env_file:
+      - ./backend/.env
     environment:
       - MONGO_URI=mongodb://mongodb:27017/todo
-      - JWT_SECRET=${JWT_SECRET:-BI_MAT}
-      - PORT=8000
-      - GMAIL_USERNAME=${GMAIL_USERNAME:-}
-      - GMAIL_PASSWORD=${GMAIL_PASSWORD:-}
     depends_on:
       - mongodb
     networks:
@@ -241,8 +235,6 @@ services:
 - [ ] **Step 1: Tạo docker-compose.prod.yml**
 
 ```yaml
-version: '3.8'
-
 services:
   mongodb:
     restart: always
@@ -253,12 +245,10 @@ services:
       target: production
     ports:
       - "8000:8000"
+    env_file:
+      - ./backend/.env
     environment:
       - MONGO_URI=mongodb://mongodb:27017/todo
-      - JWT_SECRET=${JWT_SECRET}
-      - PORT=8000
-      - GMAIL_USERNAME=${GMAIL_USERNAME:-}
-      - GMAIL_PASSWORD=${GMAIL_PASSWORD:-}
     depends_on:
       - mongodb
     networks:

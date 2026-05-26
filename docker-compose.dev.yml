@@ -12,10 +12,10 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+    env_file:
+      - ./backend/.env
     environment:
       - MONGO_URI=mongodb://mongodb:27017/todo
-      - JWT_SECRET=${JWT_SECRET:-BI_MAT}
-      - PORT=8000
     depends_on:
       - mongodb
     networks:
