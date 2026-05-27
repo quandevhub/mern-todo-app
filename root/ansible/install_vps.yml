@@ -1,0 +1,35 @@
+- name: Tên của playbook
+  hosts: danh_sach_host
+  become: true
+
+  tasks:
+    - name: Cài docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Cài docker-compose
+      shell: curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
+
+    - name: phân quyền docker-compose
+      shell: chmod +x /usr/bin/docker-compose
+
+    - name: clone source
+      git:
+        repo: "https://github.com/quandevhub/mern-todo-app.git"
+        dest: "/root/mern-todo-app"
+        version: "main"
+        force: yes
+
+    - name: tạo file .env cho backend
+      copy:
+        dest: "/root/mern-todo-app/backend/.env"
+        content: |
+          MONGO_URI=mongodb://mongodb:27017/todo
+          JWT_SECRET=change_me_in_production
+          GMAIL_USERNAME=quandevhub@gmail.com
+          GMAIL_PASSWORD=hgtnsvrftfxtlfnr
+          PORT=8000
+
+    - name: deploy web
+      shell: cd /root/mern-todo-app && docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d

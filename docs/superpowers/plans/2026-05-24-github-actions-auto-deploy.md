@@ -1,7 +1,5 @@
 # GitHub Actions Auto-Deploy Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** Tự động deploy lên VPS mỗi khi push code lên branch `main` — git pull + rebuild Docker containers qua SSH.
 
 **Architecture:** GitHub Actions lắng nghe event `push` trên `main`, dùng `appleboy/ssh-action@v1` SSH vào VPS, chạy `git pull` và `docker compose up --build -d`. Không có bước test hay build trên runner — toàn bộ build xảy ra trên server.
